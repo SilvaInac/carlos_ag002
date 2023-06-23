@@ -1,27 +1,19 @@
-import mysql.connector
-from mysql.connector import errorcode
+from sqlalchemy import create_engine
+import pandas as pd
 
 
-
-def init_connection(host,user,password,database):
+def get_data():
+    frame = None
     try:
-        db_connection = mysql.connector.connect(host=host, user=user, password=password, database=database)
-        print("Database connection made!")
-        cursor = db_connection.cursor()
-        #Necessário trocar nome do banco de dados e parametros que tinham simbolo de hifen pra underscore ( - -> _)
-        sql = ("SELECT id,age,menopause,tumor_size,inv_nodes,node_caps,deg_malig,breast,breast_quad,irradiat,class FROM cancer")
-        cursor.execute(sql)
-        for (id) in cursor:
-            print(id)
-        print("\n")
-    except mysql.connector.Error as error:
-        if error.errno == errorcode.ER_BAD_DB_ERROR:
-            print("Database doesn't exist")
-        elif error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("User name or password is wrong")
-        else:
-            print(error)
+        sqlEngine       = create_engine('mysql+pymysql://root:190401@127.0.0.1', pool_recycle=3600)
+        dbConnection    = sqlEngine.connect()
+        frame           = pd.read_sql("select * from ag002.cancer", dbConnection);
+        pd.set_option('display.expand_frame_repr', False)
+    except:
+        print("Error for connect data")
     else:
-        db_connection.close()
+        dbConnection.close()
+        return frame
 
-init_connection('localhost','root','190401','ag002')
+
+print(get_data())
