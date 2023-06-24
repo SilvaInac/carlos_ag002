@@ -14,6 +14,3 @@ def get_data():
     else:
         dbConnection.close()
         return frame
-
-
-print(get_data())
